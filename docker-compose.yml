@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  webhook-api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      WEBHOOK_SECRET: dev_secret_key_change_in_prod
+    depends_on:
+      redis:
+        condition: service_healthy
